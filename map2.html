@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.12.4/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.12.4/mapbox-gl.css' rel='stylesheet' />
+   
+      
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+ 
+       
+ 
+   <style>
+    #menu {
+        background: #fff;
+        position: absolute;
+        z-index: 1;
+        top: 120px;
+        right: 10px;
+        border-radius: 3px;
+        width: 120px;
+        border: 1px solid rgba(0,0,0,0.4);
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    #menu a {
+        font-size: 13px;
+        color: #404040;
+        display: block;
+        margin: 0;
+        padding: 0;
+        padding: 10px;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(0,0,0,0.25);
+        text-align: center;
+    }
+
+    #menu a:last-child {
+        border: none;
+    }
+
+    #menu a:hover {
+        background-color: #f8f8f8;
+        color: #404040;
+    }
+
+    #menu a.active {
+        background-color: #3887be;
+        color: #ffffff;
+    }
+
+    #menu a.active:hover {
+        background: #3074a4;
+    }
+       
+
+</style> 
+    
+<nav id="menu"></nav>
+
+<div id="map"></div> 
+    
+    
+<script>
+mapboxgl.accessToken = 'pk.eyJ1Ijoic2FrZXJpIiwiYSI6ImNpanBqbXc0djAwN2R2aG0zYzc0ODAwZ2gifQ.13Krig_iPL-AffIMheb4yg';
+var map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: 'mapbox://styles/sakeri/cijpjtt6f001ucakwvnsudxfh', //hosted style id
+    center: [25.1, 60.25], // starting position
+    zoom: 10 // starting zoom
+});
+
+    
+map.on('style.load', function () {
+    map.addSource('uv-valopiste', {
+        type: 'circle',
+        url: 'mapbox://styles/sakeri/cijpjtt6f001ucakwvnsudxfh'
+    });
+    map.addLayer({
+        'id': 'uv-valopiste',
+        'type': 'circle',
+        'source': 'uv-valopiste',
+        'paint': {
+            'circle-radius': 8,
+            'circle-color': 'rgba(55,148,179,1)'
+        },
+        'source-layer': 'uv-valopiste'
+    });
+
+    map.addLayer({
+        'id': 'view-point',
+        'type': 'circle',
+        'source': 'view-point',
+        'paint': {
+            'circle-radius': 8,
+            'circle-color': 'rgba(55,148,179,1)'
+        },
+        'source-layer': 'view-point'
+    });
+
+     map.addLayer({
+        'id': 'LPollution',
+        'type': 'raster',
+        'source': 'LPollution',
+        'source-layer': 'LPollution'
+    });
+
+     map.addLayer({
+        'id': 'satellite',
+        'type': 'raster',
+        'source': 'satellite',
+        'source-layer': 'satellite'
+    });
+
+    
+});
+
+addLayer('Viewpoints', 'view-point');
+addLayer('Streetlights', 'uv-valopiste');
+addLayer('Light pollution', 'LPollution');    
+addLayer('Satellite image', 'satellite');
+    
+function addLayer(name, id) {
+    var link = document.createElement('a');
+    link.href = '#';
+    link.className = 'active';
+    link.textContent = name;
+
+    link.onclick = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var visibility = map.getLayoutProperty(id, 'visibility');
+
+        if (visibility === 'visible') {
+            map.setLayoutProperty(id, 'visibility', 'none');
+            this.className = '';
+        } else {
+            this.className = 'active';
+            map.setLayoutProperty(id, 'visibility', 'visible');
+        }
+    };
+
+    var layers = document.getElementById('menu');
+    layers.appendChild(link);
+}
+    
+    
+// Add zoom and rotation controls to the map.
+map.addControl(new mapboxgl.Navigation());
+
+    
+
+   
+</script>
+
+
+    
+</body>
+</html>
+
