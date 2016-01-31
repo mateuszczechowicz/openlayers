@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <!-- must be included for responsiveness and must come first -->
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../bootstrap_v3/docs-assets/ico/favicon.png">
+
+    <!-- own stuff: title,... -->
+
+    <title>Dark Sites Helsinki</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="fullmap-template.css" rel="stylesheet">
+
+    <!-- Bootstrap-map-js -->
+    <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.15/esri/css/esri.css">
+    <link rel="stylesheet" type="text/css" href="src/css/bootstrapmap.css">
+
+
+    <style type="text/css">
+      #mapDiv {
+        min-height: 100%;
+        max-height: 100%;
+      }
+
+      #LocateButton {
+        position: absolute;
+        top: 95px;
+        left: 20px;
+        z-index 50;
+      }
+
+
+    </style>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../bootstrap_v3/docs-assets/js/html5shiv.js"></script>
+      <script src="../bootstrap_v3/docs-assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Dark Sites Helsinki</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <!--li class="active"><a href="#">Basemaps</a></li-->
+            <li class="active dropdown" id="basemapList">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Basemaps <b class="caret"></b></a>
+              <ul class="dropdown-menu" id="myDropdown">
+                <li><a href="#">Streets</a></li>
+                <li><a href="#">Imagery</a></li>
+                <li><a href="#">National Geographic</a></li>
+                <li><a href="#">Topographic</a></li>
+                <li><a href="#">Gray</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Open Street Map</a></li>
+              </ul>
+            </li>
+            <li ><a href="index.html">Home</a></li>
+            <!--connection to the other techniques-->
+            <li><a href="map.html">OpenlayersMap</a></li>
+            <li><a href="map2.html">MapboxMap</a></li>
+            <li class="active"><a href="map3.html">ArcGISMap</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+        <!-- Bootstrap-map-js -->
+    <div id="mapDiv"></div>
+    <script type="text/javascript">3
+      var package_path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+      var dojoConfig = {
+          //T he location.pathname.replace() logic below may look confusing but all its doing is
+          // enabling us to load the api from a CDN and load local modules from the correct location.
+          packages: [{
+              name: "application",
+              location: package_path + '/src/js'
+          }]
+      };
+    </script>
+    <script src="http://js.arcgis.com/3.15/"></script>
+    <!--<script src="http://js.arcgis.com/3.13compact"></script>-->
+    <script>
+        require([
+              "esri/map",
+              "esri/layers/FeatureLayer",
+              "esri/dijit/LocateButton",
+              "esri/dijit/Scalebar",
+              "application/bootstrapmap",
+              "dojo/domReady!"],
+          function(
+                Map,
+                FeatureLayer,
+                LocateButton,
+                Scalebar,
+                BootstrapMap) {
+
+            // Get a reference to the ArcGIS Map class
+            var map = BootstrapMap.create("mapDiv", {
+              basemap: "osm",
+              center: [25.1, 60.25],
+              zoom: 11,
+              scrollWheelZoom: true
+            });
+
+ //configure map animation to be faster
+            esriConfig.defaults.map.panDuration = 1; // time in milliseconds, default panDuration: 350
+            esriConfig.defaults.map.panRate = 1; // default panRate: 25
+            esriConfig.defaults.map.zoomDuration = 100; // default zoomDuration: 500
+            esriConfig.defaults.map.zoomRate = 1; // default zoomRate: 25
+
+//Locate Button
+            geoLocate = new LocateButton({
+              map: map
+            }, "LocateButton");
+
+            geoLocate.startup();
+
+            var HighPoints = new FeatureLayer("https://services3.arcgis.com/DrStYMBZkn3kRBe9/arcgis/rest/services/high_points/FeatureServer/0");
+
+            map.addLayer(HighPoints);
+
+             var scalebar = new Scalebar({
+              map: map,
+              scalebarStyle: "ruler",
+              scalebarUnit: "metric"
+            });
+
+            var StreetLights = new FeatureLayer("https://services3.arcgis.com/DrStYMBZkn3kRBe9/arcgis/rest/services/Street_lights/FeatureServer/0");
+
+            map.addLayer(StreetLights);
+
+           $(document).ready(function () {
+              $("#basemapList li").click(function (e) {
+                switch (e.target.text) {
+                  case "Streets":
+                    map.setBasemap("streets");
+                    break;
+                  case "Imagery":
+                    map.setBasemap("hybrid");
+                    break;
+                  case "National Geographic":
+                    map.setBasemap("national-geographic");
+                    break;
+                  case "Topographic":
+                    map.setBasemap("topo");
+                    break;
+                  case "Gray":
+                    map.setBasemap("gray");
+                    break;
+                  case "Open Street Map":
+                    map.setBasemap("osm");
+                    break;
+                }
+              });
+            });
+        });
+    </script>
+
+        <div id="LocateButton"></div>
+            <!--Footer -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <p class="text-muted">FOOOOOOOOOOOOOOTER</p>
+            </div>
+        </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
