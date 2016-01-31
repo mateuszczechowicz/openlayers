@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+<!-- must be included for responsiveness and must come first -->        
+        
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+      
+<!-- own stuff: title,... -->
+    
+        <title>Dark Sites Helsinki</title>
+
+   
+<!-- ...to include Bootstrap -->
+      
+        <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+<!--own styles--> 
+
+        <link rel="stylesheet" href="../CSS/navbar-fixed-top.css">
+        <link rel="stylesheet" href="../CSS/main.css">
+        
+        <link rel="stylesheet" href="../ol3/ol.css" type="text/css">
+        
+    </head>
+    
+    <body>
+        
+<!-- navigationbar on top, bootstrap -->        
+         <nav class="navbar navbar-default navbar-fixed-top">
+
+            <div class="container-fluid">
+                
+                <div class="navbar-header">
+                    <button class="navbar-toggle collapsed" aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse" type="button">
+                        <span class="sr-only">
+                        Toggle navigation
+                        </span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand">
+                        Dark Sites Helsinki
+                    </a>
+                </div>
+            
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a href="index.html">Home</a>
+                        </li>
+                        <li class="active">
+                            <a href="map.html">Map</a>
+                        </li>
+                        <li>
+                            <a href="info.html">Info</a>
+                        </li>
+
+                    </ul>
+                </div>
+             </div>
+        </nav>
+
+<!-- here comes the map -->
+        
+<div class="container-fluid full"> 
+     <div id="map">
+        <div id="panel" class="panel-group pull-right">
+        <div class="panel panel-default">
+            <div class="panel-heading">Baselayer </div>
+            <div class="panel-body">
+               <nav>
+                    
+                    <div id="baselayerswitcher">
+                        <input type="radio" id="osm" name="base" value="osmLayer" checked="checked"> OpenStreetMap</input><br>
+                        <input type="radio" id="aer" name="base" value="bingLayerAerial"> BingMaps Aerial</input> 
+
+                    </div>
+               </nav> 
+            </div>
+        </div>
+    
+        <div class="panel panel-default">
+            <div class="panel-heading">Layer</div>
+            <div class="panel-body">
+                <div id="layerswitcher">
+                    <input id="LightpointLayerCheckBox" type="checkbox" checked="checked"> Lights </input> <br>
+                    <input id="ViewpointLayerCheckBox" type="checkbox" checked="checked"> Viewpoints </input> <br>
+                </div>
+            </div>
+            
+        </div>
+    
+        <div class="panel panel-default">
+            <div class="panel-heading">Information</div>
+            <div class="panel-body">Mouse position: 
+                <div id="mouse-position"> </div>
+            </div>
+        </div>
+        
+        <div id="popup"></div>
+    
+        </div>
+    </div>
+</div>
+        
+<!--Footer -->      
+      
+        <footer class="footer">
+            <div class="container-fluid">
+                <p class="text-muted">footertext</p>
+            </div>
+        </footer>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+      
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+      
+    <script src="../bootstrap/js/bootstrap.min.js"></script>
+                
+<!-- additional stuff -->
+
+      <script src="../ol3/ol-debug.js"></script>
+      <script src="../js/main.js"></script>
+
+        
+    </body>
+</html>
