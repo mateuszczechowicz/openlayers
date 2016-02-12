@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <!-- must be included for responsiveness and must come first -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="fragment" content="!">
+    <!-- Responsive -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- End Responsive-->
+
+     <!-- Use protocol relative urls that way if the browser is viewing the page via HTTPS the js/css file will be requested using the HTTPS protocol -->
+    <link rel="stylesheet" href="https://js.arcgis.com/3.15/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.15/esri/css/esri.css">
+    <link rel="stylesheet" type="text/css" href="css/GeocoderButton.css">
+    <!--<link rel="stylesheet" type="text/css" href="css/HomeButton.css">-->
+
+    <!-- Bootstrap toggle-->
+
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.0/js/bootstrap-toggle.min.js"></script>
+
+
+    <!-- own stuff: title,... -->
+
+    <title>Dark Sites Helsinki</title>
+
+    <!-- Add JS to load the responsive map -->
+    <script type="text/javascript">3
+      var package_path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+      var dojoConfig = {
+          //T he location.pathname.replace() logic below may look confusing but all its doing is
+          // enabling us to load the api from a CDN and load local modules from the correct location.
+          packages: [{
+              name: "application",
+              location: package_path + '/js'
+          }, {
+            parseOnLoad: true
+          } ,{
+            name: "config",
+            location: package_path + '/config'
+          }]
+      };
+      if (location.search.match(/locale=([\w-]+)/)) {
+          dojoConfig.locale = RegExp.$1;
+    }
+    </script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/fullmap-template.css" rel="stylesheet">
+
+    <!-- Bootstrap-map-js -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrapmap.css">
+
+
+    <style type="text/css">
+
+      #mapDiv {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #HomeButton {
+        position: absolute;
+        top: 80px;
+        left: 16px;
+        z-index: 50;
+      }
+
+      #LocateButton {
+        position: absolute;
+        top: 112px;
+        left: 16px;
+        z-index: 50;
+      }
+
+      #GeocoderButton{
+        position: absolute;
+        top: 145px;
+        left: 16px;
+        z-index: 50;
+        }
+
+      #rightPane {
+        width: 20%;
+      }
+
+     #legendPane {
+        border: solid #97DCF2 1px;
+      }
+
+    </style>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../bootstrap_v3/docs-assets/js/html5shiv.js"></script>
+      <script src="../bootstrap_v3/docs-assets/js/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body class="claro">
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Dark Sites Helsinki</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <!--li class="active"><a href="#">Basemaps</a></li-->
+           <li class="active dropdown" id="basemapList">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Basemaps <b class="caret"></b></a>
+              <ul class="dropdown-menu" id="myDropdown">
+                <li><a href="#">Streets</a></li>
+                <li><a href="#">Imagery</a></li>
+                <li><a href="#">Dark gray</a></li>
+                <li><a href="#">Topographic</a></li>
+                <li><a href="#">Gray</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Open Street Map</a></li>
+              </ul>
+            </li>
+            <li ><a href="index.html">Home</a></li>
+            <!--connection to the other techniques-->
+           <li><a href="map.html">OpenlayersMap</a></li>
+            <li><a href="mapbox/map2.html">MapboxMap</a></li>
+            <li class="active"><a href="map3.html">ArcGISMap</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+     </div>
+    </div>
+
+        <!-- Bootstrap-map-js -->
+
+
+    <script src="http://js.arcgis.com/3.15/"></script>
+
+    <script>
+        require([
+              "esri/map",
+              "application/GeocoderButton",
+              "esri/arcgis/utils",
+              "esri/InfoTemplate",
+              "esri/layers/FeatureLayer",
+              "esri/layers/MapImageLayer",
+              "esri/layers/MapImage",
+              "esri/renderers/SimpleRenderer",
+              "esri/symbols/PictureMarkerSymbol",
+              "esri/dijit/HomeButton",
+              "esri/dijit/Legend",
+              "esri/dijit/LocateButton",
+              "esri/dijit/OverviewMap",
+              "esri/dijit/Scalebar",
+              "application/bootstrapmap",
+              "dojo/parser",
+              "dojo/_base/array",
+              "dijit/form/CheckBox",
+              "dijit/layout/AccordionContainer",
+              "dijit/layout/BorderContainer",
+              "dijit/layout/ContentPane",
+              "dojo/query",
+              "dojo/on",
+              "dojo/dom",
+              "dojo/dom-construct",
+              "dojo/domReady!"],
+          function(
+                Map,
+                GeocoderButton,
+                utils,
+                InfoTemplate,
+                FeatureLayer,
+                MapImageLayer,
+                MapImage,
+                SimpleRenderer,
+                PictureMarkerSymbol,
+                HomeButton,
+                Legend,
+                LocateButton,
+                OverviewMap,
+                Scalebar,
+                BootstrapMap,
+                parser,
+                arrayUtils,
+                CheckBox,
+                query,
+                on,
+                dom,
+                domConstruct) {
+
+                parser.parse();
+
+            var legendLayers = [];
+
+            var map = BootstrapMap.create("mapDiv", {
+              basemap: "dark-gray",
+              center: [25.1, 60.25],
+              zoom: 11,
+              scrollWheelZoom: true
+            });
+
+            var viewpoints = new FeatureLayer("https://services3.arcgis.com/DrStYMBZkn3kRBe9/arcgis/rest/services/view_points/FeatureServer/0", {outFields: ["*"]});
+        //we can define an image resource to use as an alternative symbol (within a simple renderer)
+            var bmpSymbol = new PictureMarkerSymbol("http://i67.tinypic.com/29x1g5.png", 35, 35);
+            var bmpRenderer = new SimpleRenderer(bmpSymbol);
+
+            viewpoints.setRenderer(bmpRenderer)
+
+            viewpoints.setInfoTemplate(new InfoTemplate("Name: ${Area}", "Description: ${Descriptio}"));
+            map.addLayer(viewpoints);
+
+        // Set popup
+            var popup = map.infoWindow;
+            popup.highlight = false;
+            popup.titleInBody = false;
+            popup.domNode.className += " light";
+
+ //configure map animation to be faster
+            esriConfig.defaults.map.panDuration = 1; // time in milliseconds, default panDuration: 350
+            esriConfig.defaults.map.panRate = 1; // default panRate: 25
+            esriConfig.defaults.map.zoomDuration = 100; // default zoomDuration: 500
+            esriConfig.defaults.map.zoomRate = 1; // default zoomRate: 25
+
+//Geocoder Button
+
+            mygeocoder= new GeocoderButton({
+                map: map,
+            }, "GeocoderButton");
+            mygeocoder.startup();
+
+
+//Home Button
+             var home = new HomeButton({
+              map: map,
+             }, "HomeButton");
+
+             home.startup();
+
+//Locate Button
+            geoLocate = new LocateButton({
+              map: map
+            }, "LocateButton");
+
+            geoLocate.startup();
+
+             var scalebar = new Scalebar({
+              map: map,
+              attachTo: "bottom-center",
+              scalebarStyle: "ruler",
+              scalebarUnit: "metric"
+            });
+
+            var overviewMapDijit = new OverviewMap({
+                map: map,
+                attachTo: "bottom-left",
+                opacity: .40,
+                width: 200,
+                visible: true
+              });
+              overviewMapDijit.startup();
+
+
+          //street lights 2
+/*
+            var streetlights2 = new FeatureLayer("https://services3.arcgis.com/DrStYMBZkn3kRBe9/arcgis/rest/services/street_lights_2/FeatureServer/0");
+
+            map.addLayer(streetlights2);
+
+            var LightPollution = new FeatureLayer("https://services3.arcgis.com/DrStYMBZkn3kRBe9/arcgis/rest/services/Street_lights/FeatureServer/0");
+
+            map.addLayer(LightPollution);*/
+/*
+            var streetlights = new FeatureLayer("https://services3.arcgis.com/DrStYMBZkn3kRBe9/arcgis/rest/services/high_points/FeatureServer/0", {
+              id: 'streetlights'
+            });
+
+            legendLayers.push({ layer: streetlights, title: 'streetlights' });
+
+            var LightPollution = new FeatureLayer("https://services3.arcgis.com/DrStYMBZkn3kRBe9/arcgis/rest/services/Street_lights/FeatureServer/0", {
+                id: 'LightPollution'
+            });
+
+            map.on('layers-add-result', function () {
+              var legend = new Legend({
+                map: map,
+                layerInfos: legendLayers
+              }, "legendDiv");
+              legend.startup();
+            });
+            legendLayers.push({ layer: LightPollution, title: "LightPollution" });
+            map.addLayers([ streetlights, LightPollution ]);
+
+            map.on('layers-add-result', function () {
+              //add check boxes
+              arrayUtils.forEach(legendLayers, function (layer) {
+                var layerName = layer.title;
+                var checkBox = new CheckBox({
+                  name: "checkBox" + layer.layer.id,
+                  value: layer.layer.id,
+                  checked: layer.layer.visible
+                });
+                checkBox.on("change", function () {
+                  var targetLayer = map.getLayer(this.value);
+                  targetLayer.setVisibility(!targetLayer.visible);
+                  this.checked = targetLayer.visible;
+                });
+
+                //add the check box and label to the toc
+                domConstruct.place(checkBox.domNode, dom.byId("toggle"), "after");
+                var checkLabel = domConstruct.create('label', {
+                    'for': checkBox.name,
+                    innerHTML: layerName
+                  }, checkBox.domNode, "after");
+                domConstruct.place("<br />", checkLabel, "after");
+              });
+            });*/
+/*
+
+              var layerURL = 'https://services3.arcgis.com/DrStYMBZkn3kRBe9/arcgis/rest/services/Street_lights/FeatureServer/0';
+              var layer = new FeatureLayer(layerURL);
+
+              var checkBox = new CheckBox({
+                  checked: false,
+                  onChange: function(checked){
+                         if(checked){
+                              map.addLayer(layer);
+                         }else{
+                              map.removeLayer(layer);
+                         }
+              }, "checkBox");
+*/
+
+
+            map.on("load", function() {
+            // create and add the layer
+            var mil = new esri.layers.MapImageLayer(
+              {
+                'opacity': 0.3
+              });
+            map.addLayer(mil);
+
+            // create an add the actual image
+            var mi = new esri.layers.MapImage({
+              'extent': { 'xmin': 24.8312980522177, 'ymin': 60.1396272514532, 'xmax': 25.2344061856669, 'ymax': 60.2895551888062},
+              'href': 'https://aalto.maps.arcgis.com/sharing/rest/content/items/28b2611073c4482aabf85fec5c75454f/data'
+            });
+            mil.addImage(mi);
+            });
+
+//layer buttons
+/*
+            // Wire UI Events
+            on(dom.byId("btnStreets"),"click", function() {
+              map.setBasemap("streets");
+            });
+            on(dom.byId("btnSatellite"),"click", function() {
+              map.setBasemap("satellite");
+            });
+            on(dom.byId("btnHybrid"),"click", function() {
+              map.setBasemap("hybrid");
+            });
+            on(dom.byId("btnTopo"),"click", function() {
+              map.setBasemap("topo");
+            });
+            on(dom.byId("btnGray"),"click", function() {
+              map.setBasemap("gray");
+            });
+            on(dom.byId("btnNatGeo"),"click", function() {
+              map.setBasemap("dark-gray");
+            });
+
+            // Toggle panel
+            on(dom.byId("chevron"), "click", function(e){
+              if (query(".glyphicon.glyphicon-chevron-up")[0]) {
+                query(".glyphicon").replaceClass("glyphicon-chevron-down","glyphicon-chevron-up");
+                query(".panel-body.collapse").removeClass("in");
+              } else {
+                query(".glyphicon").replaceClass("glyphicon-chevron-up","glyphicon-chevron-down");
+                query(".panel-body.collapse").addClass("in");
+              }
+            });*/
+
+
+
+           $(document).ready(function () {
+              $("#basemapList li").click(function (e) {
+                switch (e.target.text) {
+                  case "Streets":
+                    map.setBasemap("streets");
+                    break;
+                  case "Imagery":
+                    map.setBasemap("hybrid");
+                    break;
+                  case "Dark gray":
+                    map.setBasemap("dark-gray");
+                    break;
+                  case "Topographic":
+                    map.setBasemap("topo");
+                    break;
+                  case "Gray":
+                    map.setBasemap("gray");
+                    break;
+                  case "Open Street Map":
+                    map.setBasemap("osm");
+                    break;
+                }
+              });
+            });
+        });
+    </script>
+
+    <div class="panel panel-primary panel-fixed"
+        style=" top: 80px" id="rightPane">
+
+      <div class="panel-heading">
+        <h3 class="panel-title">Legend</h3>
+        <button id="chevron" class="btn btn-primary btn-xs btn-absolute">
+          <span class="glyphicon glyphicon-chevron-up"></span>
+        </button>
+      </div>
+
+        <div class="btn-toolbar"> </div>
+        <span id="layer_list"><div class="btn-group" data-toggle="buttons">
+          <label class="btn btn-primary">
+            <input type="checkbox" class='list_item' id='layer1CheckBox' value=0> Viewpoints
+          </label>
+          <label class="btn btn-primary">
+            <input type="checkbox" class='list_item' id='layer0CheckBox' value=1> Light Pollution
+          </label>
+        </div>
+                </span><br />
+
+      </div>
+    </div>
+
+
+    <div id="content" data-dojo-type="dijit/layout/BorderContainer"
+          data-dojo-props="design:'headline', gutters:false"
+          style="width: 100%; height: 100%; margin:0">
+<!--
+        <div id="rightPane"
+             data-dojo-type="dijit/layout/ContentPane"
+             data-dojo-props="region:'right'">
+
+            <div data-dojo-type="dijit/layout/ContentPane" id="legendPane">
+                         <span>Visibility</span>
+                         <div id="toggle"></div>
+            <div id="legendDiv"></div>
+
+            </div>
+        </div>
+-->
+        <div id="mapDiv" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'" style="overflow:hidden;"></div>
+              <div id="GeocoderButton"></div>
+              <div id="HomeButton"></div>
+              <div id="LocateButton"></div>
+    </div>
+
+        <!--Footer -->
+<!--
+        <footer class="footer">
+            <div class="container-fluid">
+                <p class="text-muted">Web map project</p>
+            </div>
+        </footer>-->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
